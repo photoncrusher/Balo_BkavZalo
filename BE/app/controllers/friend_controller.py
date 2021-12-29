@@ -3,7 +3,9 @@ from app.schemas.friend import SetRequestFriend, GetRequestedFriend, SetAcceptFr
 from app.repositories import friend_request_repo, user_repo
 from app.utils.response import ResponseModel, ErrorResponseModel
 
+
 auth_handler = AuthHandler()
+
 
 def set_request_friend(set_request_friend : SetRequestFriend):
     if user_repo.find_by_phonenumber(set_request_friend.user_id) is None:
@@ -16,6 +18,7 @@ def set_request_friend(set_request_friend : SetRequestFriend):
     return ResponseModel(code=1000, message='Success', data=None)
 
 def get_requested_friend(get_requested_friend : GetRequestedFriend):
+
     # if user_repo.find_by_phonenumber(set_request_friend.user_id) is None:
     #     return ErrorResponseModel(None,9995,message='9995')
     get_requested_friend = vars(get_requested_friend)
@@ -33,6 +36,7 @@ def get_requested_friend(get_requested_friend : GetRequestedFriend):
         list_request.append(request)
     return ResponseModel(code=1000, message='Success', data=list_request)
 
+
 def set_accept_friend(set_accept_friend : SetAcceptFriend):
     set_accept_friend = vars(set_accept_friend)
     cur_user = auth_handler.decode_token(set_accept_friend['token'])
@@ -46,25 +50,8 @@ def set_accept_friend(set_accept_friend : SetAcceptFriend):
 
 
 
-def create(comment_req : CommentRequest):
-    if post_repo.find_by_id(comment_req.id) is None:
-		# raise HTTPException(status_code=400, detail='9992')
-        return ErrorResponseModel(None, 9992, message='9992')
-    comment_dict = vars(comment_req)
-    comment_dict['post_id'] = comment_req.id
-    comment_dict.pop('index', None)
-    comment_dict.pop('count', None)
-    final_res = gen_comment_response(comment_dict, comment_dict['token'], 'create')
-    return ResponseModel(1000,'Success',data=final_res)
 
-def get_list_comment(get_comment_req : GetCommentRequest):
-    get_comment_dict = vars(get_comment_req)
-    if post_repo.find_by_id(get_comment_dict['id']) is None:
-		# raise HTTPException(status_code=400, detail='9992')
-        return ErrorResponseModel(None, 9992,message='9992')
-    results = comment_repo.get_list_comment(get_comment_dict['id'], None, get_comment_dict['count'])
-    list_comment_res = []
-    for result in results:
-        comment_response = gen_comment_response(result.to_dict(),get_comment_dict['token'],'get_list')
-        list_comment_res.append(comment_response)
-    return ResponseModel(1000,'Success',data=list_comment_res)
+
+
+
+
