@@ -89,7 +89,7 @@ class _AlphabetScrollPageState extends State<AlphabetScrollPage> {
           margin: EdgeInsets.only(right: 16),
           child: ListTile(
             title: Text(item.title),
-            onTap: () =>Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatDetailPage())),
+            // onTap: () =>Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatDetailPage())),
           ),
         )
       ],

@@ -59,42 +59,30 @@ class PostWidget extends StatelessWidget {
             alignment: Alignment.centerLeft,
           ),
           SizedBox(height: 10.0),
+          Divider(height: 20.0),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Icon(Icons.thumb_up, size: 15.0),
+                  IconButton(
+                    onPressed: () => {},
+                    icon: Icon(Icons.thumb_up,
+                        size: 20.0,
+                        color: post.isLiked ? Colors.blue : Colors.black),
+                  ),
+                  SizedBox(width: 5.0),
                   Text(' ${post.like}'),
                 ],
               ),
               Row(
                 children: <Widget>[
-                  Text('${post.comment} comments  •  '),
-                  // Text('${post.shares} shares'),
-                ],
-              ),
-            ],
-          ),
-          Divider(height: 30.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Icon(Icons.thumb_up,
-                      size: 20.0,
-                      color: post.isLiked ? Colors.blue : Colors.black),
+                  IconButton(
+                      onPressed: () => {_showCommentWidget(context)},
+                      icon: Icon(Icons.comment, size: 20.0)),
                   SizedBox(width: 5.0),
-                  Text('Like', style: TextStyle(fontSize: 14.0)),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Icon(Icons.comment, size: 20.0),
-                  SizedBox(width: 5.0),
-                  Text('Comment', style: TextStyle(fontSize: 14.0)),
+                  Text('${post.comment}'),
                 ],
               ),
               // Row(
@@ -212,5 +200,114 @@ class PostWidget extends StatelessWidget {
       icon: const Icon(Icons.more_horiz),
       tooltip: "More actions",
     );
+  }
+
+  void _showCommentWidget(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              height: MediaQuery.of(context).size.height * .60,
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    "Bình luận",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  Divider(height: 10.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () => {},
+                            icon: Icon(Icons.thumb_up,
+                                size: 20.0,
+                                color:
+                                    post.isLiked ? Colors.blue : Colors.black),
+                          ),
+                          SizedBox(width: 5.0),
+                          Text(' ${post.like}'),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          IconButton(
+                              onPressed: () => {_showCommentWidget(context)},
+                              icon: Icon(Icons.comment, size: 20.0)),
+                          SizedBox(width: 5.0),
+                          Text('${post.comment}'),
+                        ],
+                      ),
+                      // Row(
+                      //   children: <Widget>[
+                      //     Icon(Icons.share, size: 20.0),
+                      //     SizedBox(width: 5.0),
+                      //     Text('Share', style: TextStyle(fontSize: 14.0)),
+                      //   ],
+                      // ),
+                    ],
+                  ),
+                  Divider(height: 10.0),
+                  Spacer(),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                      padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                      height: 60,
+                      width: double.infinity,
+                      color: Colors.white,
+                      child: Row(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                color: Colors.lightBlue,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                  hintText: "Nhập bình luận",
+                                  hintStyle: TextStyle(color: Colors.black54),
+                                  border: InputBorder.none),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          FloatingActionButton(
+                            onPressed: () {},
+                            child: Icon(
+                              Icons.send,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            backgroundColor: Colors.blue,
+                            elevation: 0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ));
+        });
   }
 }

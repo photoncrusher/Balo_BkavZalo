@@ -3,7 +3,7 @@ import 'package:zalo/subscene/frienddetails/header/diagonally_cut_colored_image.
 import 'package:zalo/models/friend.dart';
 
 class FriendDetailHeader extends StatelessWidget {
-  static const BACKGROUND_IMAGE = 'images/profile_header_background.png';
+  static const BACKGROUND_IMAGE = 'images/profile_picture_bg.jpg';
 
   FriendDetailHeader(
     this.friend, {
@@ -46,7 +46,11 @@ class FriendDetailHeader extends StatelessWidget {
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          new Text('90 bạn chung', style: followerStyle),
+          new Text(
+            friend.name,
+            style: textTheme.headline6!.copyWith(color: Colors.white),
+          ),
+          // new Text('90 bạn chung', style: followerStyle),
         ],
       ),
     );

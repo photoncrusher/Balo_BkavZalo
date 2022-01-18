@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, Header
 from typing import Optional
-from app.schemas.post import PostRequest, ListPostRequest
+from app.schemas.post import PostRequest, ListPostRequest, LikePost
 from app.controllers import post_controller
 
 
@@ -25,3 +25,7 @@ async def delete_post(id : str):
 @router.post("/post/list_post")
 async def create_post(request: ListPostRequest):
 	return post_controller.get_list_post(request)
+
+@router.post("/post/like")
+async def like_post(request : LikePost):
+	return post_controller.like_post(request)

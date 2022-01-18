@@ -1,4 +1,4 @@
-from app.schemas.post import ReportPost, PostRequest, ListPostRequest
+from app.schemas.post import ReportPost, PostRequest, ListPostRequest, LikePost
 from app.repositories import post_repo, reported_post_repo, user_repo
 from app.auth.auth import AuthHandler
 from app.utils.response import ResponseModel, ErrorResponseModel
@@ -44,8 +44,8 @@ def update_post(id : str, post_req : PostRequest):
 	post_repo.update(id, post_dict)
 	return ResponseModel(code=1000, message='Success', data=post_dict)
 
-def get_list_post(request : ListPostRequest):
-	request_dict = vars(request)
+def get_list_post(list_post_req : ListPostRequest):
+	request_dict = vars(list_post_req)
 	if ('last_id' in request_dict.keys()) and request_dict['last_id'] is not None:
 		if (post_repo.find_by_id(request_dict['last_id']) is None) and (len(request_dict['last_id']) > 0):
 		# raise HTTPException(status_code=400, detail='9992')
@@ -75,6 +75,12 @@ def report_post(report_post_req : ReportPost):
 	reported_post_repo.save(report_post_req.dict())
 	return ResponseModel(code=1000, message='Success', data=None)
 
+def like_post(like_post : LikePost):
+	if post_repo.find_by_id(like_post.id) is None:
+		# raise HTTPException(status_code=400, detail='9992')
+		return ErrorResponseModel(None, 9992, message='9992')
+	payload = auth_handle.decode_token(like_post.token)
+	post_repo.like_post(like_post.id, payload['phonenumber'])
 
 
 # post_detail_response = {
@@ -108,9 +114,9 @@ def process_post_reponse(id : str, token: str):
 	post_detail_response['describle'] = post_res['describle']
 	post_detail_response['created'] = post_res['created']
 	post_detail_response['modified'] = post_res['modified']
-	post_detail_response['like'] = str(post_res['like']) if 'like' in post_res else None
+	post_detail_response['like'] = len(post_res['like'])
 	post_detail_response['comment'] = str(post_res['comment']) if 'comment' in post_res else None
-	post_detail_response['is_liked'] = 'false'
+	post_detail_response['is_liked'] = 'false' if  payload['phonenumber'] in post_res['like'] else 'true'
 	post_detail_response['image'] = str(post_res['image']) if 'image' in post_res else None
 	post_detail_response['video'] = str(post_res['video']) if 'video' in post_res else None
 	post_detail_response['author'] = post_res['author']

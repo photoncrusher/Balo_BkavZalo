@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zalo/apis/auth_api.dart';
 import 'package:zalo/models/api_exception.dart';
 import 'package:zalo/models/login_info.dart';
+import 'package:zalo/screens/main_screen.dart';
 import 'package:zalo/screens/no_internet.dart';
 import 'package:zalo/utils/auth_helper.dart';
 import 'package:zalo/utils/storeService.dart';
@@ -126,7 +127,12 @@ class _LoginFormState extends State<LoginScreen> {
                     LoginInfo loginInfo =
                         await _authAPI.login(_phoneNumber, _password);
                     await saveInfo(loginInfo);
-                    Navigator.pushNamed(context, '/main');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) => const MainScreen(),
+                      ),
+                    );
                   } on APIException catch (e) {
                     print('${e.code} ${e.message}');
                     if (e.code == '1004') {

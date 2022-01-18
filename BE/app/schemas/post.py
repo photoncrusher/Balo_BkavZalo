@@ -18,3 +18,7 @@ class ReportPost(BaseModel):
 	id : str = Field(...)
 	subject : str = Field(...)
 	details : str = Field(...)
+
+class LikePost(BaseModel):
+	token : str = Field(...)
+	id : str = Field(...)

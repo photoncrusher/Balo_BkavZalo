@@ -9,6 +9,7 @@ class User(BaseModel):
     phonenumber: str = Field(..., regex="^0\d{9}$")
     password: str = Field(..., regex="^\w{6,10}$")
     uuid: str = Field(...)
+    chatrooms = []
 
     def to_dict(self):
         return vars(self)

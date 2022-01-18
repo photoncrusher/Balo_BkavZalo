@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zalo/widget/conversation.dart';
 import 'package:zalo/models/chatUserModel.dart';
 
@@ -50,26 +52,70 @@ class _ChatPageState extends State<ChatPage> {
         imageURL: "images/beluwa.jpg",
         time: "18 Feb"),
   ];
+  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  // final databases = FirebaseFirestore.instance;
+  final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance
+      .collection('chat_rooms')
+      .where('user_id', whereIn: ['0858105968']).snapshots(
+          includeMetadataChanges: true);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
             child: Column(children: [
-      ListView.builder(
-        itemCount: chatUsers.length,
-        shrinkWrap: true,
-        padding: EdgeInsets.only(top: 16),
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          return ConversationList(
-            name: chatUsers[index].name,
-            messageText: chatUsers[index].messageText,
-            imageUrl: chatUsers[index].imageURL,
-            time: chatUsers[index].time,
-            isMessageRead: (index == 0 || index == 3) ? true : false,
-          );
-        },
-      ),
+      StreamBuilder<QuerySnapshot>(
+          stream: _usersStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text('Something went wrong');
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Text("Loading");
+            }
+            final chat_rooms = snapshot.data!.docs;
+            // snapshot.data!.docs.forEach((result) {
+            //   print(result.data());
+            // });
+            // if (snapshot.hasData) {
+            //   print(snapshot.data!.docs[4].data.toString());
+            // }
+            return ListView.builder(
+              itemCount: chat_rooms.length,
+              shrinkWrap: true,
+              padding: EdgeInsets.only(top: 16),
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                Map<String, dynamic> data =
+                    chat_rooms[index].data() as Map<String, dynamic>;
+
+                return ConversationList(
+                  // name: docs[index]['phonenumber'],
+                  id: data['id'],
+                  name: data['people'][0]['name'],
+                  messageText: chatUsers[index].messageText,
+                  imageUrl: chatUsers[index].imageURL,
+                  time: chatUsers[index].time,
+                  isMessageRead: (index == 0 || index == 3) ? true : false,
+                );
+              },
+            );
+            // return ListView.builder(
+            //   children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            //     Map<String, dynamic> data =
+            //         document.data()! as Map<String, dynamic>;
+            //     return ConversationList(
+            //       name: Text(data['phonenumber']).toString(),
+            //       messageText: Text(data['username']).toString(),
+            //       imageUrl: '/',
+            //       time: '12122012',
+            //       isMessageRead: false,
+            //     );
+            //   }).toList(),
+            // );
+          }),
     ])));
   }
 }

@@ -30,9 +30,11 @@ class AuthAPI {
     return LoginInfo.fromJson(jsonData['data']);
   }
 
-  Future<void> signUp(String phoneNumber, String password, String uuid) async {
+  Future<void> signUp(
+      String name, String phoneNumber, String password, String uuid) async {
     final uri = Uri.parse(BASE_URL + '/signup');
     final data = {
+      'username': name,
       'phonenumber': phoneNumber,
       'password': password,
       'uuid': uuid

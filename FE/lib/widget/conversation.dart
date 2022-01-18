@@ -7,13 +7,19 @@ class ConversationList extends StatefulWidget {
   String messageText;
   String imageUrl;
   String time;
+  String id;
   bool isMessageRead;
-  ConversationList(
-      {required this.name,
-      required this.messageText,
-      required this.imageUrl,
-      required this.time,
-      required this.isMessageRead});
+  // int role;
+
+  ConversationList({
+    required this.name,
+    required this.id,
+    required this.messageText,
+    required this.imageUrl,
+    required this.time,
+    required this.isMessageRead,
+    // required this.role,
+  });
   @override
   _ConversationListState createState() => _ConversationListState();
 }
@@ -23,8 +29,10 @@ class _ConversationListState extends State<ConversationList> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return ChatDetailPage();
+        Navigator.push(context, MaterialPageRoute(builder: (
+          context,
+        ) {
+          return ChatDetailPage(name: widget.id);
         }));
       },
       child: Container(

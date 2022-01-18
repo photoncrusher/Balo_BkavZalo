@@ -22,9 +22,10 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterFormState extends State<RegisterScreen> {
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
+  final nameController = TextEditingController();
   final phoneNumberController = TextEditingController();
   final passwordController = TextEditingController();
-  final verifyPasswordController = TextEditingController();
+  // final verifyPasswordController = TextEditingController();
 
   String _errorMessage = '';
   bool _obscureText = false;
@@ -37,7 +38,8 @@ class _RegisterFormState extends State<RegisterScreen> {
     // Clean up the controller when the widget is disposed.
     phoneNumberController.dispose();
     passwordController.dispose();
-    verifyPasswordController.dispose();
+    nameController.dispose();
+    // verifyPasswordController.dispose();
     super.dispose();
   }
 
@@ -51,7 +53,11 @@ class _RegisterFormState extends State<RegisterScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(children: [
-          
+          TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'Tên',
+              )),
           TextField(
             controller: phoneNumberController,
             decoration: InputDecoration(
@@ -73,13 +79,12 @@ class _RegisterFormState extends State<RegisterScreen> {
                       color: Colors.red,
                     ),
                   ))),
-          TextField(
-              controller: verifyPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Nhập lại mật khẩu',
-              )),
-          
+          // TextField(
+          //     controller: verifyPasswordController,
+          //     obscureText: true,
+          //     decoration: InputDecoration(
+          //       labelText: 'Nhập lại mật khẩu',
+          //     )),
           Padding(
             padding: EdgeInsets.only(top: 16.0),
             child: Text(
@@ -92,23 +97,23 @@ class _RegisterFormState extends State<RegisterScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           setErrorMessage('');
+          String name = nameController.text;
           String phoneNumber = phoneNumberController.text;
           String password = passwordController.text;
-          String verifyPassword = verifyPasswordController.text;
-          String err =
-              validatorRegisterInfo(phoneNumber, password, verifyPassword);
+          // String verifyPassword = verifyPasswordController.text;
+          // String err = validatorRegisterInfo(phoneNumber, password, password);
 
-          if (err.isNotEmpty) {
-            print(err);
-            setErrorMessage(err);
-            return;
-          }
+          // if (err.isNotEmpty) {
+          //   print(err);
+          //   setErrorMessage(err);
+          //   return;
+          // }
 
           String uuid = await getDeviceID();
           if (uuid.isEmpty) uuid = 'NoId';
           print(uuid);
           try {
-            await _authAPI.signUp(phoneNumber, password, uuid);
+            await _authAPI.signUp(name, phoneNumber, password, uuid);
             Navigator.push(
                 context,
                 MaterialPageRoute(

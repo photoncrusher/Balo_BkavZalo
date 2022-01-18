@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "324991063451",
+    "project_id": "zaloclone-bc390",
+    "storage_bucket": "zaloclone-bc390.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324991063451:android:9089beada7f676234fbd3e",
+        "android_client_info": {
+          "package_name": "com.testing.zalo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324991063451-v2hfutpvme9oil3n2r0q654s86vr3bqm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPfXhUKidi0nmFjUgkBCZKWUo-2exssE8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "324991063451-v2hfutpvme9oil3n2r0q654s86vr3bqm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

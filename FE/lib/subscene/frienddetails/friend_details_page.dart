@@ -26,8 +26,8 @@ class _FriendDetailsPageState extends State<FriendDetailsPage> {
         begin: FractionalOffset.centerRight,
         end: FractionalOffset.bottomLeft,
         colors: <Color>[
-          const Color(0xFF413070),
-          const Color(0xFF2B264A),
+          Colors.white,
+          Colors.white,
         ],
       ),
     );
@@ -47,7 +47,7 @@ class _FriendDetailsPageState extends State<FriendDetailsPage> {
                 padding: const EdgeInsets.all(24.0),
                 child: new FriendDetailBody(widget.friend),
               ),
-              new FriendShowcase(widget.friend),
+              // new FriendShowcase(widget.friend),
             ],
           ),
         ),

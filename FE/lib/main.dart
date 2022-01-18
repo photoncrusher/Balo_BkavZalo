@@ -6,6 +6,8 @@ import 'package:zalo/screens/main_screen.dart';
 import 'package:zalo/screens/post/create_post_screen.dart';
 import 'package:zalo/screens/register/register.dart';
 import 'package:zalo/utils/auth_helper.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 // import 'package:zalo/screens/chat.dart';
 
 class MyApp extends StatelessWidget {
@@ -35,6 +37,10 @@ class MyApp extends StatelessWidget {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   String initScreen = await getInitScreen();
+
+  Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(MyApp(initScreen: initScreen));
 }

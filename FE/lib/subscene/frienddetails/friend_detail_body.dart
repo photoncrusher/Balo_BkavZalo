@@ -47,32 +47,33 @@ class FriendDetailBody extends StatelessWidget {
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        new Text(
-          friend.name,
-          style: textTheme.headline5!.copyWith(color: Colors.white),
-        ),
-        new Padding(
-          padding: const EdgeInsets.only(top: 4.0),
-          child: _buildLocationInfo(textTheme),
-        ),
-        new Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: new Text(
-            'Xin chào. Hãy kết bạn với tôi.',
-            style:
-                textTheme.bodyText2!.copyWith(color: Colors.white70, fontSize: 16.0),
-          ),
-        ),
-        new Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: new Row(
-            children: <Widget>[
-              _createCircleBadge(Icons.beach_access, theme.colorScheme.secondary),
-              _createCircleBadge(Icons.cloud, Colors.white12),
-              _createCircleBadge(Icons.shop, Colors.white12),
-            ],
-          ),
-        ),
+        // new Text(
+        //   friend.name,
+        //   style: textTheme.headline5!.copyWith(color: Colors.white),
+        // ),
+        // new Padding(
+        //   padding: const EdgeInsets.only(top: 4.0),
+        //   child: _buildLocationInfo(textTheme),
+        // ),
+        // new Padding(
+        //   padding: const EdgeInsets.only(top: 16.0),
+        //   child: new Text(
+        //     'Xin chào. Hãy kết bạn với tôi.',
+        //     style: textTheme.bodyText2!
+        //         .copyWith(color: Colors.white70, fontSize: 16.0),
+        //   ),
+        // ),
+        // new Padding(
+        //   padding: const EdgeInsets.only(top: 16.0),
+        //   child: new Row(
+        //     children: <Widget>[
+        //       _createCircleBadge(
+        //           Icons.beach_access, theme.colorScheme.secondary),
+        //       _createCircleBadge(Icons.cloud, Colors.white12),
+        //       _createCircleBadge(Icons.shop, Colors.white12),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }

@@ -1,6 +1,4 @@
-from app.schemas.comment import DeleteCommentRequest
-from app.schemas.comment import GetCommentRequest
-from app.schemas.comment import CommentRequest, EditCommentRequest
+from app.schemas.comment import CommentRequest, EditCommentRequest, GetCommentRequest, DeleteCommentRequest
 from app.repositories import comment_repo, user_repo, post_repo
 from app.auth.auth import AuthHandler
 from app.utils.response import ResponseModel, ErrorResponseModel
