@@ -57,7 +57,7 @@ def get_list_post(request : ListPostRequest):
 	for post_result in results:
 		post_response = process_post_reponse(post_result.to_dict()['id'], request_dict['token'])
 		list_post_res.append(post_response)
-	print(list_post_res)
+	# print(list_post_res)
 	return ResponseModel(code=1000, message='Success', data=list_post_res)
 
 def delete_post(post_id : str):

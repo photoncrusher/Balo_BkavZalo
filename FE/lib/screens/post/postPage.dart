@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:zalo/apis/post_api.dart';
 import 'package:zalo/models/login_info.dart';
 import 'package:zalo/models/post_v2.dart';
@@ -17,6 +17,8 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   final ScrollController _scrollController = ScrollController();
+  late FToast fToast;
+
   LoginInfo? _userInfo;
 
   StoreService _storeService = StoreService();
@@ -58,6 +60,10 @@ class _PostPageState extends State<PostPage> {
   void initState() {
     loadUserInfo();
     loadData();
+
+    fToast = FToast();
+    fToast.init(context);
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
@@ -101,7 +107,11 @@ class _PostPageState extends State<PostPage> {
                           alignment: Alignment.center,
                         );
                       }
-                      return Center(child: CircularProgressIndicator());
+                      return Container(
+                        child: CircularProgressIndicator(),
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                      );
                     }
                     return PostWidget(
                       post: posts[index - 1],
@@ -133,22 +143,10 @@ class _PostPageState extends State<PostPage> {
           onTap: () async {
             dynamic result = await Navigator.pushNamed(context, '/createPost');
 
+            await Future.delayed(Duration(milliseconds: 800));
+
             if (result) {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return new AlertDialog(
-                      title: new Text("Thành công"),
-                      content: new Text("Đã đăng bài"),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("OK"))
-                      ],
-                    );
-                  });
+              _showToast("Đăng bài thành công");
               posts = [];
               allLoaded = false;
               index = 0;
@@ -180,6 +178,35 @@ class _PostPageState extends State<PostPage> {
     );
   }
 
+  void _showToast(String message) {
+    Widget toast = Material(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          color: Colors.white,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.check_circle, color: Colors.green),
+            SizedBox(
+              width: 6.0,
+            ),
+            Text(message),
+          ],
+        ),
+      ),
+      elevation: 20,
+    );
+
+    fToast.showToast(
+      child: toast,
+      gravity: ToastGravity.CENTER,
+      toastDuration: Duration(seconds: 3),
+    );
+  }
+
   Future<void> loadUserInfo() async {
     _userInfo = await _storeService.getLoginInfo();
   }
@@ -199,6 +226,7 @@ class _PostPageState extends State<PostPage> {
     switch (type) {
       case 'DELETE_POST':
         _deletePost(param['postId']);
+        // _showToast("Xóa bài thành công");
         break;
       case 'HIDE_POST':
         _hidePost(param['postId']);

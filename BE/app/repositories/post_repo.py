@@ -4,7 +4,6 @@ from app.db_connect import db
 post_ref = db.collection(u"posts")
 
 def create(post : dict):
-
 	post['created'] = firestore.SERVER_TIMESTAMP
 	post['modified'] = firestore.SERVER_TIMESTAMP
 	print("created a new post")

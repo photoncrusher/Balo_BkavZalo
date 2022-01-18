@@ -32,4 +32,10 @@ class StoreService {
     Map<String, dynamic> infoMap = json.decode(jsonString);
     return LoginInfo.fromJson(infoMap);
   }
+
+  Future<void> clearStore() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("token");
+    prefs.remove("user_info");
+  }
 }

@@ -20,16 +20,13 @@ class AuthAPI {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8'
     };
-    print("a");
     final res = await http.post(uri, headers: headers, body: jsonEncode(data));
-    print("b");
     final jsonData = jsonDecode(res.body);
     print(res.statusCode);
     print(res.body);
     if (res.statusCode >= 400) {
       throw APIException.fromJson(jsonData);
     }
-    print('c');
     return LoginInfo.fromJson(jsonData['data']);
   }
 

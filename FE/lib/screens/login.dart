@@ -32,6 +32,7 @@ class _LoginFormState extends State<LoginScreen> {
   String _password = '';
   String _errorMessage = '';
   bool _obscureText = false;
+  bool _loading = false;
 
   AuthAPI _authAPI = AuthAPI();
   AuthHelper _authHelper = AuthHelper();
@@ -95,51 +96,68 @@ class _LoginFormState extends State<LoginScreen> {
               _errorMessage,
               style: TextStyle(color: Colors.red),
             ),
-          )
+          ),
+          if (_loading) ...[
+            Align(
+              child: Text('loading...'),
+              alignment: Alignment.center,
+            )
+          ]
         ]),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          setErrorMessage('');
-          _password = password.text;
-          _phoneNumber = phoneNumber.text;
-          String err = validator(_phoneNumber, _password);
+      floatingActionButton: Opacity(
+        child: FloatingActionButton(
+          onPressed: _loading
+              ? null
+              : () async {
+                  setErrorMessage('');
+                  _password = password.text;
+                  _phoneNumber = phoneNumber.text;
+                  String err = validator(_phoneNumber, _password);
 
-          if (err.isNotEmpty) {
-            print(err);
-            setErrorMessage(err);
-            return;
-          }
+                  if (err.isNotEmpty) {
+                    print(err);
+                    setErrorMessage(err);
+                    return;
+                  }
 
-          try {
-            LoginInfo loginInfo = await _authAPI.login(_phoneNumber, _password);
-            await saveInfo(loginInfo);
-            Navigator.pushNamed(context, '/main');
-          } on APIException catch (e) {
-            print('${e.code} ${e.message}');
-            if (e.code == '1004') {
-              setErrorMessage('Sai mật khẩu');
-              return;
-            }
-            setErrorMessage(ERROR[e.code] ?? "Có lỗi xảy ra");
-          } catch (e) {
-            print(e.toString());
+                  try {
+                    startLoading();
+                    LoginInfo loginInfo =
+                        await _authAPI.login(_phoneNumber, _password);
+                    await saveInfo(loginInfo);
+                    Navigator.pushNamed(context, '/main');
+                  } on APIException catch (e) {
+                    print('${e.code} ${e.message}');
+                    if (e.code == '1004') {
+                      setErrorMessage('Sai mật khẩu');
+                      return;
+                    }
+                    setErrorMessage(ERROR[e.code] ?? "Có lỗi xảy ra");
+                  } catch (e) {
+                    print(e.toString());
 
-            bool hasConnection =
-                await ConnectionStatus.getInstance().checkConnection();
-            if (!hasConnection) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NoInternet((context) {
-                            Navigator.pop(context);
-                          })));
-              return;
-            }
-            setErrorMessage('Lỗi ko xác định');
-          }
-        },
-        child: const Icon(Icons.arrow_forward),
+                    bool hasConnection =
+                        await ConnectionStatus.getInstance().checkConnection();
+                    if (!hasConnection) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NoInternet((context) {
+                                    Navigator.pop(context);
+                                  })));
+                      return;
+                    }
+                    setErrorMessage('Lỗi ko xác định');
+                  } finally {
+                    stopLoading();
+                  }
+                },
+          child: const Icon(
+            Icons.arrow_forward,
+          ),
+        ),
+        opacity: _loading ? 0.5 : 1.0,
       ),
     );
   }
@@ -152,6 +170,18 @@ class _LoginFormState extends State<LoginScreen> {
   void setErrorMessage(String message) {
     setState(() {
       _errorMessage = message;
+    });
+  }
+
+  void startLoading() {
+    setState(() {
+      _loading = true;
+    });
+  }
+
+  void stopLoading() {
+    setState(() {
+      _loading = false;
     });
   }
 

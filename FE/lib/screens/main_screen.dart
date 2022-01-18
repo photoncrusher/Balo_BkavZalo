@@ -23,9 +23,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       onClickedItem: (item) {},
       items: ['Duy Quang', 'Ronaldo', 'Albert Einstein', 'America', 'Scammer'],
     )),
-    Scaffold(
-      body: FriendsListPage(),
-    ),
+    FriendsListPage(),
     PostPage(),
     ProfilePage(),
   ];

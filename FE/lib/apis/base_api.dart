@@ -18,7 +18,7 @@ class BaseApi {
   Future<http.Response> request(Map<String, dynamic> data, String url) async {
     final uri = Uri.parse('${BASE_URL}${url}');
     Map<String, String> headers = {
-      'Content-Type': 'application/json; charset=UTF-8'
+      'Content-Type': 'application/json;charset=utf-8'
     };
     String? token = await _storeService.getToken();
 

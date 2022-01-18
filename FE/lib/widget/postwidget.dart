@@ -43,7 +43,7 @@ class PostWidget extends StatelessWidget {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 17.0)),
                   SizedBox(height: 5.0),
-                  Text(DateFormat('yyyy/MM/dd').format(post.created))
+                  Text(DateFormat('dd/MM/yyyy').format(post.created))
                 ],
               ),
               Spacer(),
@@ -51,7 +51,13 @@ class PostWidget extends StatelessWidget {
             ],
           ),
           SizedBox(height: 20.0),
-          Text(post.describle, style: TextStyle(fontSize: 15.0)),
+          Align(
+            child: Text(
+              post.describle,
+              style: TextStyle(fontSize: 15.0),
+            ),
+            alignment: Alignment.centerLeft,
+          ),
           SizedBox(height: 10.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,21 +197,6 @@ class PostWidget extends StatelessWidget {
   void handleDeletePost() async {
     await _postApi.deletePost(post.id);
     callBack('DELETE_POST', {'postId': post.id});
-    showDialog(
-        context: parentContext,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text("Thành công"),
-            content: new Text("Đã xóa bài đăng"),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("OK"))
-            ],
-          );
-        });
   }
 
   void handleHidePost() {

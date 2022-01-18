@@ -2,14 +2,14 @@ class LoginInfo {
   final String id;
   final String token;
   final bool active;
-  String? username;
+  String username;
   String? avatar;
 
   LoginInfo(
       {required this.id,
       required this.token,
       required this.active,
-      this.username,
+      this.username = "Anonymous",
       this.avatar});
 
   factory LoginInfo.fromJson(Map<String, dynamic> json) {
