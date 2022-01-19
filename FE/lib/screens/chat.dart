@@ -14,13 +14,20 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   String _userid = "";
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> docs_total = [];
 
   @override
   void initState() {
     super.initState();
     loadState();
+    // final new_data = load_avt();
+    // custom_data =
   }
 
+  // Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> load_avt() async {
+  //   final data_new = await FirebaseFirestore.instance.collection('users').get();
+  //   return data_new.docs;
+  // }
   Future<Map<String, dynamic>> loadState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jsonInfo = prefs.getString('login_info') ?? "{'user_id': ''}";
@@ -28,11 +35,16 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _userid = userMap['id'];
     });
+    final data_total =
+        await FirebaseFirestore.instance.collection('users').get();
+    docs_total = data_total.docs;
     return userMap;
   }
 
   @override
   Widget build(BuildContext context) {
+    // final data_user = ;
+
     return Scaffold(
         body: SingleChildScrollView(
             child: Column(children: [
@@ -83,13 +95,27 @@ class _ChatPageState extends State<ChatPage> {
                     (data['people'][0]['id'] == _userid) ? 1 : 0;
 
                 // int current_host = (data['people'][0]['id'] == _userid) ? 0 : 1;
-
+                String avatar = '';
+                // FirebaseFirestore.instance
+                //     .collection('users')
+                //     .doc(data['people'][current_guest]['id'])
+                //     .get()
+                //     .then((value) =>
+                //         {avatar = value.data()!['avatar'].toString()});
+                docs_total.forEach((element) => {
+                      if (element.data()['phonenumber'] ==
+                          data['people'][current_guest]['id'])
+                        {avatar = element.data()['avatar'] ?? ' '}
+                    });
+                print(avatar);
+                // avatar = avt_data
+                // print(avatar);
                 return ConversationList(
                   // name: docs[index]['phonenumber'],
                   id: data['id'],
                   name: data['people'][current_guest]['name'],
                   messageText: data['message'].last['content'] ?? ' ',
-                  imageUrl: '',
+                  imageUrl: avatar,
                   time: DateFormat.yMMMd()
                       .add_jm()
                       .format(data['message'].last['created'].toDate()),

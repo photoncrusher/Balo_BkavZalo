@@ -36,11 +36,10 @@ class MyApp extends StatelessWidget {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  String initScreen = await getInitScreen();
-
   Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  String initScreen = await getInitScreen();
 
   runApp(MyApp(initScreen: initScreen));
 }

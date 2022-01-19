@@ -3,7 +3,6 @@ import 'package:zalo/subscene/frienddetails/footer/friend_detail_footer.dart';
 import 'package:zalo/subscene/frienddetails/friend_detail_body.dart';
 import 'package:zalo/subscene/frienddetails/header/friend_detail_header.dart';
 import 'package:zalo/models/friend.dart';
-import 'package:meta/meta.dart';
 
 class FriendDetailsPage extends StatefulWidget {
   FriendDetailsPage(

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zalo/screens/main_screen.dart';
+import 'package:zalo/screens/profilePage.dart';
 import 'package:zalo/subscene/frienddetails/header/diagonally_cut_colored_image.dart';
 import 'package:zalo/models/friend.dart';
 import 'package:image_picker/image_picker.dart';
@@ -64,7 +66,13 @@ class _SelfDetailHeaderState extends State<SelfDetailHeader> {
             FirebaseFirestore.instance
                 .collection('users')
                 .doc(_userid)
-                .update({"avatar": value.toString()})
+                .update({"avatar": value.toString()}),
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) => const MainScreen(),
+              ),
+            )
           });
     } on FirebaseException catch (e) {}
     ;

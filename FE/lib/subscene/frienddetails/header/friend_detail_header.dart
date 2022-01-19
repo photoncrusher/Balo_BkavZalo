@@ -140,7 +140,7 @@ class FriendDetailHeader extends StatelessWidget {
                         'id': docRef.id,
                         'message': [], // John Doe
                         'people': [
-                          {'name': userMap['usename'], 'id': userMap['id']},
+                          {'name': userMap['username'], 'id': userMap['id']},
                           {'name': friend.name, 'id': friend.email}
                         ], // Stokes and Sons
                         'people_array': [userMap['id'], friend.email] // 42
