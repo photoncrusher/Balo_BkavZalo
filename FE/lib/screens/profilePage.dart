@@ -15,8 +15,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   StoreService _storeService = StoreService();
-  late String _username = "A";
-  String? _avatar = null;
+  LoginInfo _user =
+      LoginInfo(id: "None", token: "None", active: false, username: "A");
 
   @override
   void initState() {
@@ -24,15 +24,11 @@ class _ProfilePageState extends State<ProfilePage> {
     loadState();
   }
 
-  Future<Map<String, dynamic>> loadState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String jsonInfo = prefs.getString('login_info') ?? "{'user_id': ''}";
-    Map<String, dynamic> userMap = json.decode(jsonInfo);
+  Future<void> loadState() async {
+    LoginInfo info = await _storeService.getLoginInfo();
     setState(() {
-      _username = userMap['usename'] ?? 'Anonymous';
-      _avatar = userMap['avatar'];
+      _user = info;
     });
-    return userMap;
   }
 
   // void loadState() async {
@@ -80,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // ])));
     Friend fr_temp = new Friend(
       avatar: '',
-      name: _username,
+      name: _user.username,
       email: '',
       location: 'Ha noi',
     );
@@ -89,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         children: [
           ListTile(
-            title: Text(_username),
+            title: Text(_user.username),
             onTap: () => {
               Navigator.of(context).push(
                 new MaterialPageRoute(
@@ -100,10 +96,13 @@ class _ProfilePageState extends State<ProfilePage> {
               )
             },
             leading: CircleAvatar(
-              backgroundImage:
-                  _avatar != null ? NetworkImage(_avatar ?? '') : null,
+              backgroundImage: _user.avatar != null
+                  ? NetworkImage(_user.avatar ?? '')
+                  : null,
               // child: _avatar == null ? Text(_username.substring(0, 1)) : null,
-              child: _avatar == null ? Text("A") : null,
+              child: _user.avatar == null
+                  ? Text(_user.username.substring(0, 1))
+                  : null,
               radius: 20.0,
             ),
           ),

@@ -75,14 +75,14 @@ class Post {
         describle: json['describle'],
         created: created,
         modified: modified,
-        like: 0,
+        like: json['like'],
         comment: json['comment'] ?? 0,
         isLiked: json['is_liked'] == 'true',
         author: author,
         state: json['state'] ?? "",
         isBlocked: json['is_blocked'] == 'true',
         canEdit: json['can_edit'][0] == 'true',
-        canComment: json['can_comment'] == 'True',
+        canComment: json['can_comment'] == 'true',
         banned: json['banned'] == '1');
 
     // if (json['image'] != null) {

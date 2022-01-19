@@ -21,9 +21,8 @@ class AuthAPI {
       'Content-Type': 'application/json; charset=UTF-8'
     };
     final res = await http.post(uri, headers: headers, body: jsonEncode(data));
-    final jsonData = jsonDecode(res.body);
-    print(res.statusCode);
-    print(res.body);
+    final jsonData = jsonDecode(utf8.decode(res.bodyBytes));
+    print("***${res.body}***");
     if (res.statusCode >= 400) {
       throw APIException.fromJson(jsonData);
     }

@@ -127,12 +127,14 @@ class _LoginFormState extends State<LoginScreen> {
                     LoginInfo loginInfo =
                         await _authAPI.login(_phoneNumber, _password);
                     await saveInfo(loginInfo);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) => const MainScreen(),
-                      ),
-                    );
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute<void>(
+                    //     builder: (BuildContext context) => const MainScreen(),
+                    //   ),
+                    // );
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/main', (Route<dynamic> route) => false);
                   } on APIException catch (e) {
                     print('${e.code} ${e.message}');
                     if (e.code == '1004') {

@@ -22,6 +22,7 @@ class StoreService {
 
   Future<void> saveLoginInfo(LoginInfo loginInfo) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(json.encode(loginInfo.toJson()));
     prefs.setString("login_info", json.encode(loginInfo.toJson()));
   }
 
@@ -36,6 +37,6 @@ class StoreService {
   Future<void> clearStore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("token");
-    prefs.remove("user_info");
+    prefs.remove("login_info");
   }
 }

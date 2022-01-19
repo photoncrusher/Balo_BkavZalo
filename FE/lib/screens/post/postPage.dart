@@ -165,7 +165,7 @@ class _PostPageState extends State<PostPage> {
                 ? NetworkImage(_userInfo?.avatar ?? ' ')
                 : null,
             child: _userInfo?.avatar == null
-                ? Text(_userInfo?.username?.substring(0, 1) ?? 'A')
+                ? Text(_userInfo?.username.substring(0, 1) ?? 'A')
                 : null,
             radius: 20.0,
           ),
@@ -265,7 +265,11 @@ class _PostPageState extends State<PostPage> {
   }
 
   Future<void> loadUserInfo() async {
-    _userInfo = await _storeService.getLoginInfo();
+    LoginInfo info = await _storeService.getLoginInfo();
+    print(info.username);
+    setState(() {
+      _userInfo = info;
+    });
   }
 
   int getPostIndex(String postId) {

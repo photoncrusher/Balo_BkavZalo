@@ -469,6 +469,7 @@ class _PostWidgetState extends State<PostWidget> {
                                   if (_allCommentLoaded) {
                                     setModalState(() {
                                       comments.add(comment);
+                                      widget.post.comment++;
                                     });
                                   }
                                 } catch (err) {

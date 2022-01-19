@@ -9,13 +9,13 @@ class LoginInfo {
       {required this.id,
       required this.token,
       required this.active,
-      this.username = "Anonymous",
+      required this.username,
       this.avatar});
 
   factory LoginInfo.fromJson(Map<String, dynamic> json) {
     return LoginInfo(
       id: json['id'],
-      username: json['username'] ?? "Anonymous",
+      username: json['username'],
       token: json['token'],
       active: json['active'],
       avatar: json['avatar'],
@@ -25,7 +25,7 @@ class LoginInfo {
   Map<String, dynamic> toJson() {
     return {
       "id": this.id,
-      "usename": this.username,
+      "username": this.username,
       "token": this.token,
       "active": this.active,
       "avatar": this.avatar,
