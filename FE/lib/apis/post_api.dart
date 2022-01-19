@@ -74,17 +74,25 @@ class PostApi {
     return false;
   }
 
+  Future<void> likePost(Map<String, dynamic> data) async {
+    print("likePost");
+    final res = await _api.request(data, "/post/like");
+
+    final jsonData = jsonDecode(res.body);
+    if (res.statusCode >= 400) {
+      throw APIException.fromJson(jsonData);
+    }
+  }
+
   Future<Comment> createComment(Map<String, dynamic> data) async {
     print("createComment");
     final res = await _api.request(data, "/comment/create");
 
     final jsonData = jsonDecode(res.body);
-
     if (res.statusCode >= 400) {
       throw APIException.fromJson(jsonData);
     }
-
-    return Comment.fromJson(jsonData);
+    return Comment.fromJson(jsonData['data']);
   }
 
   Future<List<Comment>> getListComment(Map<String, dynamic> data) async {

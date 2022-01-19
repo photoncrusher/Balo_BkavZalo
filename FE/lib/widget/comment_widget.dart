@@ -11,6 +11,7 @@ class CommentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        SizedBox(width: 8.0),
         CircleAvatar(
           backgroundImage: comment.author.avatar != null
               ? NetworkImage(comment.author.avatar ?? '')
@@ -20,6 +21,7 @@ class CommentWidget extends StatelessWidget {
               : null,
           radius: 20.0,
         ),
+        SizedBox(width: 8.0),
         Column(
           children: [
             Text(comment.author.name ?? "X",
@@ -28,11 +30,13 @@ class CommentWidget extends StatelessWidget {
             Text(comment.comment),
             SizedBox(height: 8.0),
             Text(DateFormat('dd/MM/yyyy').format(comment.created),
-                style: TextStyle(color: Colors.grey[500]))
+                style: TextStyle(color: Colors.grey[500])),
           ],
           mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
         )
       ],
+      crossAxisAlignment: CrossAxisAlignment.start,
     );
   }
 }

@@ -139,11 +139,11 @@ class _PostPageState extends State<PostPage> {
           ),
           title: Text("Hôm nay bạn thế nào?"),
           onTap: () async {
-            dynamic result = await Navigator.pushNamed(context, '/createPost');
+            bool? result = await Navigator.pushNamed(context, '/createPost');
 
             await Future.delayed(Duration(milliseconds: 800));
 
-            if (result) {
+            if (result != null && result) {
               _showToast("Đăng bài thành công");
               posts = [];
               allLoaded = false;

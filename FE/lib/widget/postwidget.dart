@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zalo/apis/post_api.dart';
@@ -28,6 +29,7 @@ class _PostWidgetState extends State<PostWidget> {
   final StoreService _storeService = StoreService();
   List<Comment> comments = [];
   bool _loading = false;
+  bool _loadedComment = false;
   bool _allCommentLoaded = false;
 
   final commentController = TextEditingController();
@@ -90,7 +92,7 @@ class _PostWidgetState extends State<PostWidget> {
               Row(
                 children: <Widget>[
                   IconButton(
-                    onPressed: () => {},
+                    onPressed: handleLikePressed,
                     icon: Icon(Icons.thumb_up,
                         size: 20.0,
                         color:
@@ -206,6 +208,19 @@ class _PostWidgetState extends State<PostWidget> {
         });
   }
 
+  void handleLikePressed() async {
+    final post = widget.post;
+    try {
+      await _postApi.likePost({"id": post.id});
+      setState(() {
+        post.isLiked = !post.isLiked;
+        post.like = post.isLiked ? post.like + 1 : post.like - 1;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   void setLoading(bool state) {
     setState(() {
       _loading = state;
@@ -221,35 +236,39 @@ class _PostWidgetState extends State<PostWidget> {
     widget.callBack('HIDE_POST', {'postId': widget.post.id});
   }
 
-  void _loadComments() async {
-    if (_allCommentLoaded) return;
-    String token = await _storeService.getToken() ?? "";
-    setLoading(true);
-    try {
-      List<Comment> data = await _postApi.getListComment({
-        "token": token,
-        "id": widget.post.id,
-        "index": "${comments.length}",
-        "count": "${COUNT}",
+  void _loadComments(void Function(void Function()) callback) async {
+    if (!_loadedComment) {
+      _loadedComment = true;
+      String token = await _storeService.getToken() ?? "";
+      callback(() {
+        _loading = true;
       });
-      setState(() {
-        comments.addAll(data);
-        _allCommentLoaded = data.length < COUNT;
-      });
-    } catch (err) {
-      print(err);
-    } finally {
-      setLoading(false);
+      try {
+        List<Comment> data = await _postApi.getListComment({
+          "token": token,
+          "id": widget.post.id,
+          "index": "${comments.length}",
+          "count": "${COUNT}",
+        });
+        callback(() {
+          comments.addAll(data);
+          _allCommentLoaded = data.length < COUNT;
+        });
+      } catch (err) {
+        print(err);
+      } finally {
+        callback(() {
+          _loading = false;
+        });
+      }
     }
   }
 
   void handleCreateCommentPressed() async {
     final commentTxt = commentController.text;
     if (commentTxt.isEmpty) return;
-    String token = await _storeService.getToken() ?? "";
     try {
       Comment comment = await _postApi.createComment({
-        "token": token,
         "id": widget.post.id,
         "comment": commentTxt,
         "index": "${comments.length}",
@@ -258,7 +277,8 @@ class _PostWidgetState extends State<PostWidget> {
       commentController.text = "";
       if (_allCommentLoaded) {
         setState(() {
-          comments.add(comment);
+          // comments.add(comment);
+          comments.insert(0, comment);
         });
       }
     } catch (err) {
@@ -278,123 +298,170 @@ class _PostWidgetState extends State<PostWidget> {
   }
 
   void _showCommentWidget(context) {
-    _loadComments();
+    // _loadComments();
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
-          return Container(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              height: MediaQuery.of(context).size.height * .60,
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    "Bình luận",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  Divider(height: 10.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          IconButton(
-                            onPressed: () => {},
-                            icon: Icon(Icons.thumb_up,
-                                size: 20.0,
-                                color: widget.post.isLiked
-                                    ? Colors.blue
-                                    : Colors.black),
-                          ),
-                          SizedBox(width: 5.0),
-                          Text(' ${widget.post.like}'),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          IconButton(
-                              onPressed: () => {_showCommentWidget(context)},
-                              icon: Icon(Icons.comment, size: 20.0)),
-                          SizedBox(width: 5.0),
-                          Text('${widget.post.comment}'),
-                        ],
-                      ),
-                      // Row(
-                      //   children: <Widget>[
-                      //     Icon(Icons.share, size: 20.0),
-                      //     SizedBox(width: 5.0),
-                      //     Text('Share', style: TextStyle(fontSize: 14.0)),
-                      //   ],
-                      // ),
-                    ],
-                  ),
-                  Divider(height: 10.0),
-                  Expanded(
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        return CommentWidget(comment: comments[index]);
-                      },
-                      itemCount: comments.length,
-                      shrinkWrap: true,
+          return StatefulBuilder(builder: (context, setModalState) {
+            _loadComments(setModalState);
+            return Container(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                height: MediaQuery.of(context).size.height * .60,
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      "Bình luận",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
-                  ),
-                  // Spacer(),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Container(
-                      padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
-                      height: 60,
-                      width: double.infinity,
-                      color: Colors.white,
-                      child: Row(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              height: 30,
-                              width: 30,
-                              decoration: BoxDecoration(
-                                color: Colors.lightBlue,
-                                borderRadius: BorderRadius.circular(30),
+                    Divider(height: 10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              onPressed: () => {},
+                              icon: Icon(Icons.thumb_up,
+                                  size: 20.0,
+                                  color: widget.post.isLiked
+                                      ? Colors.blue
+                                      : Colors.black),
+                            ),
+                            SizedBox(width: 5.0),
+                            Text(' ${widget.post.like}'),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                                onPressed: () => {_showCommentWidget(context)},
+                                icon: Icon(Icons.comment, size: 20.0)),
+                            SizedBox(width: 5.0),
+                            Text('${widget.post.comment}'),
+                          ],
+                        ),
+                        // Row(
+                        //   children: <Widget>[
+                        //     Icon(Icons.share, size: 20.0),
+                        //     SizedBox(width: 5.0),
+                        //     Text('Share', style: TextStyle(fontSize: 14.0)),
+                        //   ],
+                        // ),
+                      ],
+                    ),
+                    Divider(height: 10.0),
+                    Expanded(
+                        child: ScrollConfiguration(
+                      child: ListView.separated(
+                        itemBuilder: (context, index) {
+                          if (index == comments.length) {
+                            if (_loading) {
+                              return Container(
+                                child: CircularProgressIndicator(),
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.only(
+                                    top: 4.0, bottom: 4.0),
+                              );
+                            }
+                            return Text("");
+                          }
+                          return CommentWidget(comment: comments[index]);
+                        },
+                        itemCount: comments.length + 1,
+                        shrinkWrap: true,
+                        separatorBuilder: (context, index) => Divider(
+                          indent: 16,
+                          endIndent: 16,
+                        ),
+                      ),
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                        },
+                      ),
+                    )),
+                    // Spacer(),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                        height: 60,
+                        width: double.infinity,
+                        color: Colors.white,
+                        child: Row(
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                height: 30,
+                                width: 30,
+                                decoration: BoxDecoration(
+                                  color: Colors.lightBlue,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
                               ),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: commentController,
+                                decoration: InputDecoration(
+                                    hintText: "Nhập bình luận",
+                                    hintStyle: TextStyle(color: Colors.black54),
+                                    border: InputBorder.none),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            FloatingActionButton(
+                              onPressed: () async {
+                                final commentTxt = commentController.text;
+                                if (commentTxt.isEmpty) return;
+
+                                try {
+                                  Comment comment =
+                                      await _postApi.createComment({
+                                    "id": widget.post.id,
+                                    "comment": commentTxt,
+                                    "index": "${comments.length}",
+                                    "count": "${COUNT}",
+                                  });
+                                  commentController.text = "";
+                                  if (_allCommentLoaded) {
+                                    setModalState(() {
+                                      comments.add(comment);
+                                    });
+                                  }
+                                } catch (err) {
+                                  print(err);
+                                }
+                              },
                               child: Icon(
-                                Icons.add,
+                                Icons.send,
                                 color: Colors.white,
-                                size: 20,
+                                size: 18,
                               ),
+                              backgroundColor: Colors.blue,
+                              elevation: 0,
                             ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: commentController,
-                              decoration: InputDecoration(
-                                  hintText: "Nhập bình luận",
-                                  hintStyle: TextStyle(color: Colors.black54),
-                                  border: InputBorder.none),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          FloatingActionButton(
-                            onPressed: handleCreateCommentPressed,
-                            child: Icon(
-                              Icons.send,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            backgroundColor: Colors.blue,
-                            elevation: 0,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ));
+                  ],
+                ));
+          });
         });
   }
 }
