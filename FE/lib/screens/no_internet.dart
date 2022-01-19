@@ -13,7 +13,7 @@ class NoInternet extends StatelessWidget {
           child: Column(
         children: [
           TextButton(
-              onPressed: () => callback(context), child: Text("click me")),
+              onPressed: () => callback(context), child: Text("Go back")),
           Spacer(
             flex: 2,
           ),
