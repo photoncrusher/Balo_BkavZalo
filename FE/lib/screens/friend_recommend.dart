@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zalo/subscene/frienddetails/friend_details_page.dart';
 import 'package:zalo/models/friend.dart';
 
@@ -15,7 +15,7 @@ class FriendsListPage extends StatefulWidget {
 
 class _FriendsListPageState extends State<FriendsListPage> {
   List<Friend> _friends = [];
-  String _userid = "";
+  // String _userid = "";
 
   @override
   void initState() {
@@ -44,7 +44,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
       var result_data = result.data();
       print(result_data);
       Friend fr_temp = new Friend(
-        avatar: '',
+        avatar: result_data['avatar'] ?? '',
         name: result_data['username'],
         email: result_data['phonenumber'],
         location: 'Ha noi',

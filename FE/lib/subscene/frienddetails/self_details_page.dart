@@ -5,12 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:zalo/subscene/frienddetails/footer/friend_detail_footer.dart';
 import 'package:zalo/subscene/frienddetails/friend_detail_body.dart';
-import 'package:zalo/subscene/frienddetails/header/friend_detail_header.dart';
 import 'package:zalo/models/friend.dart';
-import 'package:meta/meta.dart';
 import 'package:zalo/subscene/frienddetails/header/self_detail_header.dart';
-import 'package:path/path.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class SelfDetailsPage extends StatefulWidget {
   SelfDetailsPage(
