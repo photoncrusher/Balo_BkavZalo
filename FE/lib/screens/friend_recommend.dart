@@ -42,7 +42,6 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
     data.docs.forEach((result) {
       var result_data = result.data();
-      print(result_data);
       Friend fr_temp = new Friend(
         avatar: result_data['avatar'] ?? '',
         name: result_data['username'],
