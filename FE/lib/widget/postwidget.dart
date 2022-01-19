@@ -1,21 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zalo/apis/post_api.dart';
+import 'package:zalo/models/comment.dart';
 import 'package:zalo/models/post_v2.dart';
+import 'package:zalo/utils/storeService.dart';
+import 'package:zalo/widget/comment_widget.dart';
 
 enum PostRole { owner, viewer }
+const COUNT = 20;
 
-class PostWidget extends StatelessWidget {
-  final Post post;
+class PostWidget extends StatefulWidget {
   final void Function(String type, Map<String, dynamic>) callBack;
   final BuildContext parentContext;
-
-  final PostApi _postApi = PostApi();
+  final Post post;
 
   PostWidget(
       {required this.post,
       required this.callBack,
       required this.parentContext});
+
+  @override
+  _PostWidgetState createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  final PostApi _postApi = PostApi();
+  final StoreService _storeService = StoreService();
+  List<Comment> comments = [];
+  bool _loading = false;
+  bool _allCommentLoaded = false;
+
+  final commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    commentController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +48,11 @@ class PostWidget extends StatelessWidget {
           Row(
             children: <Widget>[
               CircleAvatar(
-                backgroundImage: post.author.avatar != null
-                    ? NetworkImage(post.author.avatar ?? '')
+                backgroundImage: widget.post.author.avatar != null
+                    ? NetworkImage(widget.post.author.avatar ?? '')
                     : null,
-                child: post.author.avatar == null
-                    ? Text(post.author.name?.substring(0, 1) ?? 'A')
+                child: widget.post.author.avatar == null
+                    ? Text(widget.post.author.name?.substring(0, 1) ?? 'A')
                     : null,
                 radius: 20.0,
               ),
@@ -39,21 +61,22 @@ class PostWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(post.author.name ?? 'anonymous',
+                  Text(widget.post.author.name ?? 'anonymous',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 17.0)),
                   SizedBox(height: 5.0),
-                  Text(DateFormat('dd/MM/yyyy').format(post.created))
+                  Text(DateFormat('dd/MM/yyyy').format(widget.post.created))
                 ],
               ),
               Spacer(),
-              buildMenu(post.canEdit ? PostRole.owner : PostRole.viewer, post),
+              buildMenu(widget.post.canEdit ? PostRole.owner : PostRole.viewer,
+                  widget.post),
             ],
           ),
           SizedBox(height: 20.0),
           Align(
             child: Text(
-              post.describle,
+              widget.post.describle,
               style: TextStyle(fontSize: 15.0),
             ),
             alignment: Alignment.centerLeft,
@@ -70,10 +93,11 @@ class PostWidget extends StatelessWidget {
                     onPressed: () => {},
                     icon: Icon(Icons.thumb_up,
                         size: 20.0,
-                        color: post.isLiked ? Colors.blue : Colors.black),
+                        color:
+                            widget.post.isLiked ? Colors.blue : Colors.black),
                   ),
                   SizedBox(width: 5.0),
-                  Text(' ${post.like}'),
+                  Text(' ${widget.post.like}'),
                 ],
               ),
               Row(
@@ -82,7 +106,7 @@ class PostWidget extends StatelessWidget {
                       onPressed: () => {_showCommentWidget(context)},
                       icon: Icon(Icons.comment, size: 20.0)),
                   SizedBox(width: 5.0),
-                  Text('${post.comment}'),
+                  Text('${widget.post.comment}'),
                 ],
               ),
               // Row(
@@ -160,7 +184,7 @@ class PostWidget extends StatelessWidget {
 
   void handleOwnerDeletePost() async {
     showDialog(
-        context: parentContext,
+        context: widget.parentContext,
         builder: (BuildContext context) {
           return new AlertDialog(
             title: new Text("Xác nhận"),
@@ -182,13 +206,64 @@ class PostWidget extends StatelessWidget {
         });
   }
 
+  void setLoading(bool state) {
+    setState(() {
+      _loading = state;
+    });
+  }
+
   void handleDeletePost() async {
-    await _postApi.deletePost(post.id);
-    callBack('DELETE_POST', {'postId': post.id});
+    await _postApi.deletePost(widget.post.id);
+    widget.callBack('DELETE_POST', {'postId': widget.post.id});
   }
 
   void handleHidePost() {
-    callBack('HIDE_POST', {'postId': post.id});
+    widget.callBack('HIDE_POST', {'postId': widget.post.id});
+  }
+
+  void _loadComments() async {
+    if (_allCommentLoaded) return;
+    String token = await _storeService.getToken() ?? "";
+    setLoading(true);
+    try {
+      List<Comment> data = await _postApi.getListComment({
+        "token": token,
+        "id": widget.post.id,
+        "index": "${comments.length}",
+        "count": "${COUNT}",
+      });
+      setState(() {
+        comments.addAll(data);
+        _allCommentLoaded = data.length < COUNT;
+      });
+    } catch (err) {
+      print(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  void handleCreateCommentPressed() async {
+    final commentTxt = commentController.text;
+    if (commentTxt.isEmpty) return;
+    String token = await _storeService.getToken() ?? "";
+    try {
+      Comment comment = await _postApi.createComment({
+        "token": token,
+        "id": widget.post.id,
+        "comment": commentTxt,
+        "index": "${comments.length}",
+        "count": "${COUNT}",
+      });
+      commentController.text = "";
+      if (_allCommentLoaded) {
+        setState(() {
+          comments.add(comment);
+        });
+      }
+    } catch (err) {
+      print(err);
+    }
   }
 
   Widget buildMenu(PostRole postRole, Post post) {
@@ -203,6 +278,7 @@ class PostWidget extends StatelessWidget {
   }
 
   void _showCommentWidget(context) {
+    _loadComments();
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
@@ -226,11 +302,12 @@ class PostWidget extends StatelessWidget {
                             onPressed: () => {},
                             icon: Icon(Icons.thumb_up,
                                 size: 20.0,
-                                color:
-                                    post.isLiked ? Colors.blue : Colors.black),
+                                color: widget.post.isLiked
+                                    ? Colors.blue
+                                    : Colors.black),
                           ),
                           SizedBox(width: 5.0),
-                          Text(' ${post.like}'),
+                          Text(' ${widget.post.like}'),
                         ],
                       ),
                       Row(
@@ -239,7 +316,7 @@ class PostWidget extends StatelessWidget {
                               onPressed: () => {_showCommentWidget(context)},
                               icon: Icon(Icons.comment, size: 20.0)),
                           SizedBox(width: 5.0),
-                          Text('${post.comment}'),
+                          Text('${widget.post.comment}'),
                         ],
                       ),
                       // Row(
@@ -252,7 +329,16 @@ class PostWidget extends StatelessWidget {
                     ],
                   ),
                   Divider(height: 10.0),
-                  Spacer(),
+                  Expanded(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return CommentWidget(comment: comments[index]);
+                      },
+                      itemCount: comments.length,
+                      shrinkWrap: true,
+                    ),
+                  ),
+                  // Spacer(),
                   Align(
                     alignment: Alignment.bottomLeft,
                     child: Container(
@@ -283,6 +369,7 @@ class PostWidget extends StatelessWidget {
                           ),
                           Expanded(
                             child: TextField(
+                              controller: commentController,
                               decoration: InputDecoration(
                                   hintText: "Nhập bình luận",
                                   hintStyle: TextStyle(color: Colors.black54),
@@ -293,7 +380,7 @@ class PostWidget extends StatelessWidget {
                             width: 15,
                           ),
                           FloatingActionButton(
-                            onPressed: () {},
+                            onPressed: handleCreateCommentPressed,
                             child: Icon(
                               Icons.send,
                               color: Colors.white,

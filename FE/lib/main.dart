@@ -52,6 +52,7 @@ Future<String> getInitScreen() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String? token = prefs.getString('token');
+    // print(token);
     if (token != null) {
       var payloadMap = AuthHelper().parseJwt(token);
       var expiredTime = payloadMap['exp'];
@@ -61,6 +62,6 @@ Future<String> getInitScreen() async {
   } catch (err) {
     print(err);
   }
-
+  // print(initScreen);
   return initScreen;
 }

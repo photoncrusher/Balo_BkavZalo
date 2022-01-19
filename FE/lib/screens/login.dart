@@ -100,7 +100,7 @@ class _LoginFormState extends State<LoginScreen> {
           ),
           if (_loading) ...[
             Align(
-              child: Text('loading...'),
+              child: Text('Đang xử lý...'),
               alignment: Alignment.center,
             )
           ]

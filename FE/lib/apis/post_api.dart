@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:zalo/apis/base_api.dart';
 import 'package:zalo/constants/api_path.dart';
 import 'package:zalo/models/api_exception.dart';
+import 'package:zalo/models/comment.dart';
 import 'package:zalo/models/post_v2.dart';
 
 class PostApi {
@@ -71,5 +72,37 @@ class PostApi {
     if (jsonData['code'] == 1000) return true;
 
     return false;
+  }
+
+  Future<Comment> createComment(Map<String, dynamic> data) async {
+    print("createComment");
+    final res = await _api.request(data, "/comment/create");
+
+    final jsonData = jsonDecode(res.body);
+
+    if (res.statusCode >= 400) {
+      throw APIException.fromJson(jsonData);
+    }
+
+    return Comment.fromJson(jsonData);
+  }
+
+  Future<List<Comment>> getListComment(Map<String, dynamic> data) async {
+    print("getListComment");
+    final res = await _api.request(data, "/comment/list");
+
+    final jsonData = jsonDecode(res.body);
+
+    if (res.statusCode >= 400) {
+      throw APIException.fromJson(jsonData);
+    }
+
+    List<Comment> comments = [];
+    List<dynamic> listCommentJson = jsonData['data'];
+    for (final commentJson in listCommentJson) {
+      Comment comment = Comment.fromJson(commentJson);
+      comments.add(comment);
+    }
+    return comments;
   }
 }
