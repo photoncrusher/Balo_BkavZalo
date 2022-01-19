@@ -171,7 +171,7 @@ class _PostPageState extends State<PostPage> {
           ),
           title: Text("Hôm nay bạn thế nào?"),
           onTap: () async {
-            bool? result = await Navigator.pushNamed(context, '/createPost');
+            dynamic result = await Navigator.pushNamed(context, '/createPost');
 
             await Future.delayed(Duration(milliseconds: 800));
 

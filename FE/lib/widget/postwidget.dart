@@ -375,28 +375,35 @@ class _PostWidgetState extends State<PostWidget> {
                     Divider(height: 10.0),
                     Expanded(
                         child: ScrollConfiguration(
-                      child: ListView.separated(
-                        itemBuilder: (context, index) {
-                          if (index == comments.length) {
-                            if (_loading) {
-                              return Container(
-                                child: CircularProgressIndicator(),
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.only(
-                                    top: 4.0, bottom: 4.0),
-                              );
-                            }
-                            return Text("");
-                          }
-                          return CommentWidget(comment: comments[index]);
-                        },
-                        itemCount: comments.length + 1,
-                        shrinkWrap: true,
-                        separatorBuilder: (context, index) => Divider(
-                          indent: 16,
-                          endIndent: 16,
-                        ),
-                      ),
+                      child: (comments.length == 0 &&
+                              _allCommentLoaded &&
+                              !_loading)
+                          ? Text(
+                              "Chưa có bình luận nào",
+                              textAlign: TextAlign.center,
+                            )
+                          : ListView.separated(
+                              itemBuilder: (context, index) {
+                                if (index == comments.length) {
+                                  if (_loading) {
+                                    return Container(
+                                      child: CircularProgressIndicator(),
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.only(
+                                          top: 4.0, bottom: 4.0),
+                                    );
+                                  }
+                                  return Text("");
+                                }
+                                return CommentWidget(comment: comments[index]);
+                              },
+                              itemCount: comments.length + 1,
+                              shrinkWrap: true,
+                              separatorBuilder: (context, index) => Divider(
+                                indent: 16,
+                                endIndent: 16,
+                              ),
+                            ),
                       behavior: ScrollConfiguration.of(context).copyWith(
                         dragDevices: {
                           PointerDeviceKind.touch,
