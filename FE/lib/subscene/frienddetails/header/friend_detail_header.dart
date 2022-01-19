@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zalo/screens/chatDetail.dart';
 import 'package:zalo/subscene/frienddetails/header/diagonally_cut_colored_image.dart';
 import 'package:zalo/models/friend.dart';
 
@@ -56,34 +61,19 @@ class FriendDetailHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(ThemeData theme) {
-    return new Padding(
-      padding: const EdgeInsets.only(
-        top: 16.0,
-        left: 16.0,
-        right: 16.0,
-      ),
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          _createPillButton(
-            'Kết bạn',
-            backgroundColor: theme.colorScheme.secondary,
-          ),
-          new DecoratedBox(
-            decoration: new BoxDecoration(
-              border: new Border.all(color: Colors.white30),
-              borderRadius: new BorderRadius.circular(30.0),
-            ),
-            child: _createPillButton(
-              'Nhắn tin',
-              textColor: Colors.white70,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Future<Map<String, dynamic>> load_rooms(String email) async {
+
+  //   // setState(() {
+  //   //   _id = userMap['id'];
+  //   // });
+  //   // data.docs.forEach((element) {
+  //   //   print(element.data()['id']);
+  //   // });
+  //   return data.docs[0].data();
+  // }
+
+  // Widget _buildActionButtons(ThemeData theme) {
+  //   return new
 
   Widget _createPillButton(
     String text, {
@@ -96,7 +86,9 @@ class FriendDetailHeader extends StatelessWidget {
         minWidth: 140.0,
         color: backgroundColor,
         textColor: textColor,
-        onPressed: () {},
+        onPressed: () {
+          // return ChatDetailPage(name: friend.email);
+        },
         child: new Text(text),
       ),
     );
@@ -117,7 +109,61 @@ class FriendDetailHeader extends StatelessWidget {
             children: <Widget>[
               _buildAvatar(),
               _buildFollowerInfo(textTheme),
-              _buildActionButtons(theme),
+              // _buildActionButtons(theme),
+              ClipRRect(
+                borderRadius: new BorderRadius.circular(30.0),
+                child: new MaterialButton(
+                  minWidth: 140.0,
+                  color: Colors.transparent,
+                  textColor: Colors.white70,
+                  onPressed: () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    String jsonInfo =
+                        prefs.getString('login_info') ?? "{'user_id': ''}";
+                    Map<String, dynamic> userMap = json.decode(jsonInfo);
+                    final data = await FirebaseFirestore.instance
+                        .collection('chat_rooms')
+                        .where('people_array', whereIn: [
+                      [userMap['id'], friend.email],
+                      [friend.email, userMap['id']]
+                    ]).get();
+                    String _id = "";
+                    if (data.docs.isNotEmpty) {
+                      _id = data.docs[0].data()['id'].toString();
+                    } else {
+                      DocumentReference docRef = await FirebaseFirestore
+                          .instance
+                          .collection('chat_rooms')
+                          .doc();
+                      await docRef.set({
+                        'id': docRef.id,
+                        'message': [], // John Doe
+                        'people': [
+                          {'name': userMap['usename'], 'id': userMap['id']},
+                          {'name': friend.name, 'id': friend.email}
+                        ], // Stokes and Sons
+                        'people_array': [userMap['id'], friend.email] // 42
+                      });
+                      final data2 = await FirebaseFirestore.instance
+                          .collection('chat_rooms')
+                          .where('people_array', whereIn: [
+                        [userMap['id'], friend.email],
+                        [friend.email, userMap['id']]
+                      ]).get();
+                      _id = data2.docs[0].data()['id'].toString();
+                      // print(_id);
+                    }
+
+                    Navigator.push(context, MaterialPageRoute(builder: (
+                      context,
+                    ) {
+                      return ChatDetailPage(name: _id);
+                    }));
+                  },
+                  child: new Text('Tin nhan'),
+                ),
+              ),
             ],
           ),
         ),

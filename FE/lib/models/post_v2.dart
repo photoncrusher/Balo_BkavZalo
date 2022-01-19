@@ -75,7 +75,7 @@ class Post {
         describle: json['describle'],
         created: created,
         modified: modified,
-        like: json['like'] ?? 0,
+        like: 0,
         comment: json['comment'] ?? 0,
         isLiked: json['is_liked'] == 'true',
         author: author,

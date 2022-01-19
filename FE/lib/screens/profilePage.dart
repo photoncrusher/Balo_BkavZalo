@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zalo/models/login_info.dart';
 import 'package:zalo/utils/storeService.dart';
+import 'package:zalo/models/friend.dart';
+import 'package:zalo/screens/intro.dart';
+import 'package:zalo/subscene/frienddetails/self_details_page.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -13,35 +16,94 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   StoreService _storeService = StoreService();
   late String _username = "A";
-  String? _avatar;
+  String? _avatar = null;
 
   @override
   void initState() {
-    loadState();
     super.initState();
+    loadState();
   }
 
-  void loadState() async {
-    LoginInfo info = await _storeService.getLoginInfo();
+  Future<Map<String, dynamic>> loadState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonInfo = prefs.getString('login_info') ?? "{'user_id': ''}";
+    Map<String, dynamic> userMap = json.decode(jsonInfo);
     setState(() {
-      _username = info.username;
-      _avatar = info.avatar;
+      _username = userMap['usename'] ?? 'Anonymous';
+      _avatar = userMap['avatar'];
     });
+    return userMap;
   }
+
+  // void loadState() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String jsonInfo =
+  //       prefs.getString('user_info') ?? "{'username': 'Anonymous'}";
+
+  //   Map<String, dynamic> userMap = json.decode(jsonInfo);
+  //   print(userMap);
+  //   setState(() {
+  //     _username = userMap['usename'] ?? 'Anonymous';
+  //     _avatar = userMap['avatar'];
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
+    // return Scaffold(
+    //     body: SingleChildScrollView(
+    //         child: Column(children: <Widget>[
+    //   Container(
+    //       height: 360.0,
+    //       child: Stack(children: <Widget>[
+    //         Container(
+    //           margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+    //           height: 180.0,
+    //           decoration: BoxDecoration(
+    //               image: DecorationImage(
+    //                   image: AssetImage('assets/zalo002.jpg'),
+    //                   fit: BoxFit.cover),
+    //               borderRadius: BorderRadius.circular(10.0)),
+    //         ),
+    //         Column(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+    //           CircleAvatar(
+    //             backgroundImage: AssetImage('images/beluwa.jpg'),
+    //             radius: 70.0,
+    //           ),
+    //           SizedBox(height: 20.0),
+    //           Text('Duy Quang',
+    //               style:
+    //                   TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+    //           SizedBox(height: 20.0)
+    //         ])
+    //       ]))
+    // ])));
+    Friend fr_temp = new Friend(
+      avatar: '',
+      name: _username,
+      email: '',
+      location: 'Ha noi',
+    );
     return Scaffold(
         body: SingleChildScrollView(
       child: Column(
         children: [
           ListTile(
             title: Text(_username),
-            onTap: () {},
+            onTap: () => {
+              Navigator.of(context).push(
+                new MaterialPageRoute(
+                  builder: (c) {
+                    return new SelfDetailsPage(fr_temp, avatarTag: '');
+                  },
+                ),
+              )
+            },
             leading: CircleAvatar(
               backgroundImage:
                   _avatar != null ? NetworkImage(_avatar ?? '') : null,
-              child: _avatar == null ? Text(_username.substring(0, 1)) : null,
+              // child: _avatar == null ? Text(_username.substring(0, 1)) : null,
+              child: _avatar == null ? Text("A") : null,
               radius: 20.0,
             ),
           ),

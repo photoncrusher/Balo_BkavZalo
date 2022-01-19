@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zalo/widget/conversation.dart';
-import 'package:zalo/models/chatUserModel.dart';
+// import 'package:zalo/models/chatUserModel.dart';
 
 class ChatPage extends StatefulWidget {
   @override
@@ -10,55 +13,23 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<ChatUsers> chatUsers = [
-    ChatUsers(
-        name: "Jane Russel",
-        messageText: "Awesome Setup",
-        imageURL: "images/beluwa.jpg",
-        time: "Now"),
-    ChatUsers(
-        name: "Glady's Murphy",
-        messageText: "That's Great",
-        imageURL: "images/beluwa.jpg",
-        time: "Yesterday"),
-    ChatUsers(
-        name: "Jorge Henry",
-        messageText: "Hey where are you?",
-        imageURL: "images/beluwa.jpg",
-        time: "31 Mar"),
-    ChatUsers(
-        name: "Philip Fox",
-        messageText: "Busy! Call me in 20 mins",
-        imageURL: "images/beluwa.jpg",
-        time: "28 Mar"),
-    ChatUsers(
-        name: "Debra Hawkins",
-        messageText: "Thankyou, It's awesome",
-        imageURL: "images/beluwa.jpg",
-        time: "23 Mar"),
-    ChatUsers(
-        name: "Jacob Pena",
-        messageText: "will update you in evening",
-        imageURL: "images/beluwa.jpg",
-        time: "17 Mar"),
-    ChatUsers(
-        name: "Andrey Jones",
-        messageText: "Can you please share the file?",
-        imageURL: "images/beluwa.jpg",
-        time: "24 Feb"),
-    ChatUsers(
-        name: "John Wick",
-        messageText: "How are you?",
-        imageURL: "images/beluwa.jpg",
-        time: "18 Feb"),
-  ];
-  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String _userid = "";
 
-  // final databases = FirebaseFirestore.instance;
-  final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance
-      .collection('chat_rooms')
-      .where('user_id', whereIn: ['0858105968']).snapshots(
-          includeMetadataChanges: true);
+  @override
+  void initState() {
+    super.initState();
+    loadState();
+  }
+
+  Future<Map<String, dynamic>> loadState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonInfo = prefs.getString('login_info') ?? "{'user_id': ''}";
+    Map<String, dynamic> userMap = json.decode(jsonInfo);
+    setState(() {
+      _userid = userMap['id'];
+    });
+    return userMap;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +37,10 @@ class _ChatPageState extends State<ChatPage> {
         body: SingleChildScrollView(
             child: Column(children: [
       StreamBuilder<QuerySnapshot>(
-          stream: _usersStream,
+          stream: FirebaseFirestore.instance
+              .collection('chat_rooms')
+              .where('people_array', arrayContainsAny: [_userid]).snapshots(
+                  includeMetadataChanges: true),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
@@ -75,7 +49,17 @@ class _ChatPageState extends State<ChatPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Text("Loading");
             }
-            final chat_rooms = snapshot.data!.docs;
+            // final temp = snapshot.data!.docs;
+            final chat_rooms = [];
+            snapshot.data!.docs.forEach((element) {
+              Map<String, dynamic> data =
+                  element.data() as Map<String, dynamic>;
+              if (data['message'].isNotEmpty) {
+                chat_rooms.add(element);
+              }
+              ;
+            });
+            // temp
             // snapshot.data!.docs.forEach((result) {
             //   print(result.data());
             // });
@@ -86,18 +70,25 @@ class _ChatPageState extends State<ChatPage> {
               itemCount: chat_rooms.length,
               shrinkWrap: true,
               padding: EdgeInsets.only(top: 16),
-              physics: NeverScrollableScrollPhysics(),
+              physics: AlwaysScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 Map<String, dynamic> data =
                     chat_rooms[index].data() as Map<String, dynamic>;
 
+                int current_guest =
+                    (data['people'][0]['id'] == _userid) ? 1 : 0;
+
+                // int current_host = (data['people'][0]['id'] == _userid) ? 0 : 1;
+
                 return ConversationList(
                   // name: docs[index]['phonenumber'],
                   id: data['id'],
-                  name: data['people'][0]['name'],
-                  messageText: chatUsers[index].messageText,
-                  imageUrl: chatUsers[index].imageURL,
-                  time: chatUsers[index].time,
+                  name: data['people'][current_guest]['name'],
+                  messageText: data['message'].last['content'] ?? ' ',
+                  imageUrl: '',
+                  time: DateFormat.yMMMd()
+                      .add_jm()
+                      .format(data['message'].last['created'].toDate()),
                   isMessageRead: (index == 0 || index == 3) ? true : false,
                 );
               },

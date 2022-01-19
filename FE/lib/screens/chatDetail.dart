@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +36,34 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   //       messageContent: "Is there any thing wrong?", messageType: "sender"),
   // ];
   // final Stream<QuerySnapshot> _usersStream = ;
+  String _userid = "";
+  String _chatInput = "";
+
+  final chatInputController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    loadState();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    chatInputController.dispose();
+    super.dispose();
+  }
+
+  Future<Map<String, dynamic>> loadState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonInfo = prefs.getString('login_info') ?? "{'user_id': ''}";
+    Map<String, dynamic> userMap = json.decode(jsonInfo);
+    setState(() {
+      _userid = userMap['id'];
+    });
+    return userMap;
+  }
+
   @override
   Widget build(BuildContext context) {
     print(widget.name);
@@ -55,10 +85,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
           final List<ChatMessage> messages = [];
           // chat_rooms.forEach((k, v) => weightData.add(Weight(k, v)));
+          int current_guest = (data['people'][0]['id'] == _userid) ? 1 : 0;
+
+          int current_host = (data['people'][0]['id'] == _userid) ? 0 : 1;
           data['message'].forEach((message) {
             // print(message['content']);
+            String msg_type =
+                (data['people'][current_host]['id'] == message['user_id'])
+                    ? "sender"
+                    : "receiver";
             messages.add(ChatMessage(
-                messageContent: message['content'], messageType: "receiver"));
+                messageContent: message['content'], messageType: msg_type));
           });
           // print(data['message'][1]['content']);
 
@@ -94,7 +131,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Text(
-                              data['people'][0]['name'],
+                              data['people'][current_guest]['name'],
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -104,7 +141,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                               height: 6,
                             ),
                             Text(
-                              "Online",
+                              "",
                               style: TextStyle(
                                   color: Colors.grey.shade200, fontSize: 13),
                             ),
@@ -123,11 +160,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             body: Stack(
               children: <Widget>[
                 ListView.builder(
+                  reverse: true,
                   itemCount: messages.length,
                   shrinkWrap: true,
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
+                  padding: EdgeInsets.only(
+                      top: 10, bottom: kFloatingActionButtonMargin + 48),
+                  physics: AlwaysScrollableScrollPhysics(),
+                  itemBuilder: (context, index_old) {
+                    int index = messages.length - 1 - index_old;
+                    // print(messages.length);
                     return Container(
                       padding: EdgeInsets.only(
                           left: 14, right: 14, top: 10, bottom: 10),
@@ -182,6 +223,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         ),
                         Expanded(
                           child: TextField(
+                            controller: chatInputController,
                             decoration: InputDecoration(
                                 hintText: "Tin nhắn",
                                 hintStyle: TextStyle(color: Colors.black54),
@@ -192,7 +234,27 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                           width: 15,
                         ),
                         FloatingActionButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _chatInput = chatInputController.text;
+                            if (_chatInput != '') {
+                              FirebaseFirestore.instance
+                                  .collection('chat_rooms')
+                                  .doc(data['id'])
+                                  .update({
+                                'message': FieldValue.arrayUnion([
+                                  {
+                                    'content': _chatInput,
+                                    'user_id': data['people'][current_host]
+                                        ['id'],
+                                    'created':
+                                        Timestamp.fromDate(DateTime.now())
+                                  }
+                                ])
+                              });
+                            }
+                            ;
+                            chatInputController.clear();
+                          },
                           child: Icon(
                             Icons.send,
                             color: Colors.white,

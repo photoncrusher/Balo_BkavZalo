@@ -6,6 +6,8 @@ import 'package:zalo/models/comment.dart';
 import 'package:zalo/models/post_v2.dart';
 import 'package:zalo/utils/storeService.dart';
 import 'package:zalo/widget/comment_widget.dart';
+import 'package:zalo/subscene/frienddetails/friend_details_page.dart';
+import 'package:zalo/models/friend.dart';
 
 enum PostRole { owner, viewer }
 const COUNT = 20;
@@ -19,7 +21,9 @@ class PostWidget extends StatefulWidget {
       {required this.post,
       required this.callBack,
       required this.parentContext});
+// void _navigateToFriendDetails(Friend friend, Object avatarTag) {
 
+//   }
   @override
   _PostWidgetState createState() => _PostWidgetState();
 }
@@ -43,20 +47,37 @@ class _PostWidgetState extends State<PostWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Friend fr_temp = new Friend(
+      avatar: widget.post.author.avatar ?? '',
+      name: widget.post.author.name ?? 'Anonymous',
+      email: '',
+      location: 'Ha noi',
+    );
     return Container(
       padding: EdgeInsets.all(15.0),
       child: Column(
         children: <Widget>[
           Row(
             children: <Widget>[
-              CircleAvatar(
-                backgroundImage: widget.post.author.avatar != null
-                    ? NetworkImage(widget.post.author.avatar ?? '')
-                    : null,
-                child: widget.post.author.avatar == null
-                    ? Text(widget.post.author.name?.substring(0, 1) ?? 'A')
-                    : null,
-                radius: 20.0,
+              GestureDetector(
+                onTap: () => {
+                  Navigator.of(context).push(
+                    new MaterialPageRoute(
+                      builder: (c) {
+                        return new FriendDetailsPage(fr_temp, avatarTag: '');
+                      },
+                    ),
+                  )
+                },
+                child: CircleAvatar(
+                  backgroundImage: widget.post.author.avatar != null
+                      ? NetworkImage(widget.post.author.avatar ?? '')
+                      : null,
+                  child: widget.post.author.avatar == null
+                      ? Text(widget.post.author.name?.substring(0, 1) ?? 'A')
+                      : null,
+                  radius: 20.0,
+                ),
               ),
               SizedBox(width: 7.0),
               Column(
