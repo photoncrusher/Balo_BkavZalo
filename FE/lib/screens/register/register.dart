@@ -76,7 +76,7 @@ class _RegisterFormState extends State<RegisterScreen> {
                     },
                     child: Icon(
                       _obscureText ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.red,
+                      color: _obscureText ? Colors.blue : Colors.grey,
                     ),
                   ))),
           // TextField(

@@ -107,7 +107,10 @@ class _SelfDetailHeaderState extends State<SelfDetailHeader> {
                       insetPadding: EdgeInsets.fromLTRB(50, 200, 50, 200),
                       child: Column(children: [
                         ListTile(
-                            title: Text("Chụp ảnh mới"),
+                            title: Text(
+                              "Chụp ảnh mới",
+                              textAlign: TextAlign.center,
+                            ),
                             onTap: () {
                               pickImage()
                                   .then((value) =>
@@ -115,7 +118,10 @@ class _SelfDetailHeaderState extends State<SelfDetailHeader> {
                                   .then((value) => {print(value)});
                             }),
                         ListTile(
-                            title: Text("Chọn ảnh từ máy"),
+                            title: Text(
+                              "Chọn ảnh từ máy",
+                              textAlign: TextAlign.center,
+                            ),
                             onTap: () {
                               pickImage2().then(
                                   (value) => {uploadImageToFirebase(context)});

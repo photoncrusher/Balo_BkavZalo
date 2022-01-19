@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zalo/models/login_info.dart';
 import 'package:zalo/utils/storeService.dart';
 import 'package:zalo/models/friend.dart';
-import 'package:zalo/screens/intro.dart';
 import 'package:zalo/subscene/frienddetails/self_details_page.dart';
 
 class ProfilePage extends StatefulWidget {
