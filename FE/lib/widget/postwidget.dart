@@ -488,6 +488,9 @@ class _PostWidgetState extends State<PostWidget> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: MediaQuery.of(context).viewInsets.bottom,
+                    ),
                   ],
                 ));
           });
