@@ -88,7 +88,7 @@ class _LoginFormState extends State<LoginScreen> {
                     },
                     child: Icon(
                       _obscureText ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.red,
+                      color: _obscureText ? Colors.blue : Colors.grey,
                     ),
                   ))),
           Padding(

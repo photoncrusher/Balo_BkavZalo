@@ -88,7 +88,7 @@ class PostApi {
     print("createComment");
     final res = await _api.request(data, "/comment/create");
 
-    final jsonData = jsonDecode(res.body);
+    final jsonData = jsonDecode(utf8.decode(res.bodyBytes));
     if (res.statusCode >= 400) {
       throw APIException.fromJson(jsonData);
     }
@@ -99,7 +99,7 @@ class PostApi {
     print("getListComment");
     final res = await _api.request(data, "/comment/list");
 
-    final jsonData = jsonDecode(res.body);
+    final jsonData = jsonDecode(utf8.decode(res.bodyBytes));
 
     if (res.statusCode >= 400) {
       throw APIException.fromJson(jsonData);

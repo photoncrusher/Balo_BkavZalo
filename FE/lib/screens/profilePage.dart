@@ -2,11 +2,9 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zalo/models/login_info.dart';
 import 'package:zalo/utils/storeService.dart';
 import 'package:zalo/models/friend.dart';
-import 'package:zalo/screens/intro.dart';
 import 'package:zalo/subscene/frienddetails/self_details_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -16,8 +14,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   StoreService _storeService = StoreService();
-  LoginInfo _user =
-      LoginInfo(id: "None", token: "None", active: false, username: "");
+  LoginInfo _user = LoginInfo.empty();
   String avatar = '';
 
   @override

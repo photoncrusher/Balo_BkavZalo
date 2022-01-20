@@ -22,6 +22,16 @@ class LoginInfo {
     );
   }
 
+  factory LoginInfo.empty() {
+    return LoginInfo(
+      id: "None",
+      username: "None",
+      token: "None",
+      active: false,
+      avatar: null,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       "id": this.id,

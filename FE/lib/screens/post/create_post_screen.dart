@@ -81,25 +81,47 @@ class _CreatePostState extends State<CreatePostScreen> {
                               elevation: 16,
                               insetPadding:
                                   EdgeInsets.fromLTRB(50, 200, 50, 200),
-                              child: Column(children: [
-                                ListTile(
-                                    title: Text("Chụp ảnh mới"),
-                                    onTap: () {
-                                      pickImage().then((value) =>
-                                          {uploadImageToFirebase(context)});
-                                    }),
-                                ListTile(
-                                    title: Text("Chọn ảnh từ máy"),
-                                    onTap: () {
-                                      pickImage2().then((value) =>
-                                          {uploadImageToFirebase(context)});
-                                    }),
-                              ]));
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                      title: Text(
+                                        "Chụp ảnh mới",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      onTap: () {
+                                        pickImage().then((value) =>
+                                            {uploadImageToFirebase(context)});
+                                      }),
+                                  ListTile(
+                                      title: Text(
+                                        "Chọn ảnh từ máy",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      onTap: () {
+                                        pickImage2().then((value) =>
+                                            {uploadImageToFirebase(context)});
+                                      }),
+                                ],
+                              ));
                         });
                   },
-                  child: Text('Đăng ảnh')),
-              TextButton(onPressed: () {}, child: Text('Đăng video')),
+                  child:
+                      Icon(Icons.image, size: 24.0, color: Colors.grey[700])),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.ondemand_video,
+                    size: 24.0, color: Colors.grey[700]),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.link, size: 24.0, color: Colors.grey[700]),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.place, size: 24.0, color: Colors.grey[700]),
+              )
             ],
+            mainAxisAlignment: MainAxisAlignment.end,
           )
         ],
       ),

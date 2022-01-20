@@ -59,7 +59,11 @@ class _ChatPageState extends State<ChatPage> {
               return Text('Something went wrong');
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading");
+              return Container(
+                child: CircularProgressIndicator(),
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+              );
             }
             // final temp = snapshot.data!.docs;
             final chat_rooms = [];

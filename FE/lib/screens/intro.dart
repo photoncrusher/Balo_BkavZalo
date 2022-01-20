@@ -102,14 +102,17 @@ class IntroScreen extends StatelessWidget {
       body: Center(
         child: Column(children: [
           Image.asset(
+            // 600 480
             Images.INTRO,
-            width: 600,
-            height: 480,
+            width: 440,
+            height: 352,
             fit: BoxFit.cover,
           ),
           // textSection(context),
+          Spacer(flex: 1),
           loginSelection(context),
           const Text("Tiếng Việt"),
+          Spacer(flex: 2),
         ]),
       ),
     );
