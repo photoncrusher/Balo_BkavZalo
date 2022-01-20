@@ -8,6 +8,7 @@ import 'package:zalo/screens/post/postPage.dart';
 import 'package:zalo/screens/profilePage.dart';
 import 'package:zalo/screens/contact.dart';
 import 'package:zalo/screens/friend_recommend.dart';
+import 'package:zalo/screens/search.dart';
 
 class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({Key? key}) : super(key: key);
@@ -99,6 +100,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 // document.get() => then(function(document) {
 //     print(document("name"));
 // });
+
     return Scaffold(
       appBar: AppBar(
           leading: IconButton(
@@ -161,21 +163,5 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MyStatefulWidget();
-  }
-}
-
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("search screen"),
-      ),
-      body: Center(
-        child: Text("Search Screen"),
-      ),
-    );
   }
 }
